@@ -1,0 +1,70 @@
+name: Build Zig Package
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Install Zig
+          run: |
+            wget https://ziglang.org/builds/zig-linux-x86_64-0.12.0-dev.1814+5c0d58b71.tar.xz
+            tar -xf zig-linux-x86_64-0.12.0-dev.1814+5c0d58b71.tar.xz
+            sudo cp zig-linux-x86_64-0.12.0-dev.1814+5c0d58b71/zig /usr/local/bin/zig
+            sudo cp -r zig-linux-x86_64-0.12.0-dev.1814+5c0d58b71/lib /usr/local/bin/lib
+
+      - name: Build Zig Package
+        run: |
+          zig build
+
+      - name: Create Tar GZ Archive
+          run: |
+            cp zre.zig zig-out/
+            cp README.md zig-out/
+            cp LICENSE zig-out/
+            tar -czvf zre-v0.1.0.tar.gz zig-out
+
+      - name: Verify Artifact Hash
+        run: |
+          hash=$(sha256sum zre-v0.1.0.tar.gz | awk '{ print $1 }')
+          expected_hash="f78586d924e1e46520a110ef802008457130062f2b9d815d4d9ecbcdf965339b"
+          if [ "$hash" != "$expected_hash" ]; then
+            echo "Hash mismatch. Exiting."
+            exit 1
+          else
+            echo "Hash verified."
+          fi
+
+      - name: Upload Artifact
+          uses: actions/upload-artifact@v2
+          with:
+            name: zre-v0.1.0
+            path: zre-v0.1.0.tar.gz
+
+      - name: Create Release
+          id: create_release
+          uses: actions/create-release@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            tag_name: v0.1.0
+            release_name: zre-v0.1.0
+            body: |
+              zre-v0.1.0
+
+      - name: Upload Release Artifact
+          id: upload-release-asset
+          uses: actions/upload-release-asset@v1
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          with:
+            upload_url: ${{ steps.create_release.outputs.upload_url }}
+            asset_path: zre-v0.1.0.tar.gz
+            asset_name: zre-v0.1.0.tar.gz
+            asset_content_type: application/gzip
