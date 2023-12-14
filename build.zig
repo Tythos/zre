@@ -13,6 +13,9 @@ pub fn build(b: *std.build.Builder) void {
     });
     b.installArtifact(lib);
 
+    // export module definition
+    _ = b.addModule("zre", .{ .source_file = .{ .path = "zre.zig" } });
+
     // define library tests
     const main_tests = b.addTest(.{
         .root_source_file = .{ .path = "tests.zig" },

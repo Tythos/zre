@@ -23,3 +23,9 @@ Top-level exports include:
 * `search()`
 
 For the time being, basic examples for these symbols are best drawn from `tests.zig`.
+
+To install via zig-fetch, use the latest commit:
+
+```sh
+$ zig fetch 
+```
