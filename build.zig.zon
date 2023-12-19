@@ -7,10 +7,8 @@
     // This field is optional and currently advisory-only
     .minimum_zig_version = "0.12.0",
 
-    // Each dependency must either provide a `url` and `hash`, or a `path`.
-    .dependencies = .{
-        // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
-    },
+    // See `zig fetch --save <url>` for a command-line interface for adding dependencies.
+    .dependencies = .{},
 
     // Only contents listed here are used in the `hash` for this package
     .paths = .{

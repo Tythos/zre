@@ -1,6 +1,7 @@
 const std = @import("std");
 
 pub fn build(b: *std.build.Builder) void {
+    // forward build options
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -22,6 +23,8 @@ pub fn build(b: *std.build.Builder) void {
         .target = target,
         .optimize = optimize,
     });
+
+    // add test stage to build
     const run_unit_tests = b.addRunArtifact(main_tests);
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&run_unit_tests.step);
